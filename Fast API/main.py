@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Query,Path,Body
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 
 app = FastAPI()
 
@@ -171,7 +171,7 @@ async def read_items_validation(
 '''
 
 # part7--body multiple parameter
-
+'''
 class Item(BaseModel):
     name: str
     description: str |None = None
@@ -205,3 +205,22 @@ async def update_item(
     if importance:
         results.update({"importance":importance})       
     return results    
+'''
+
+
+
+''' Body-Fields'''
+
+
+class  Item(BaseModel):
+    name: str
+    description: str | None = Field(
+        None,title="the description of the item",max_length=300
+    )
+    price: float=Field(...,gt=0, description="the price must be grater than zero.")
+    tax: float |None = None
+
+@app.put("/items/{item_id}")
+async def update_item(item_id:int ,item:Item = Body(...,embed=True)):
+    results={"item_id":item_id,"item":item}
+    return results  
